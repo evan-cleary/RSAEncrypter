@@ -1,4 +1,4 @@
-package rsaencrypter;
+package com.division.rsaencrypter.core;
 
 import java.io.File;
 import java.io.FileInputStream;
