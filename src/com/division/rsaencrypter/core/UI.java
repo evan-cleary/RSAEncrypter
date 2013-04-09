@@ -6,6 +6,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.xml.bind.DatatypeConverter;
 
 /**
@@ -14,7 +15,7 @@ import javax.xml.bind.DatatypeConverter;
  */
 public class UI extends javax.swing.JFrame {
 
-    File rsaDir;
+    private File rsaDir;
 
     /**
      * Creates new form UI
@@ -24,6 +25,26 @@ public class UI extends javax.swing.JFrame {
         rsaDir = new File(System.getProperty("user.dir"), "rsa");
         if (!rsaDir.exists()) {
             rsaDir.mkdirs();
+        }
+        initKeyPair();
+    }
+
+    public File getRSADir(){
+        return rsaDir;
+    }
+
+    private void initKeyPair() {
+        try {
+            RSAFileIO.load(rsaDir);
+            RSAFileIO.loadPrivateKey(rsaDir);
+        } catch (Exception ex) {
+            try {
+                KeyPair keys = RSAKeygen.generate(2048);
+                RSAFileIO.save(rsaDir, keys);
+                JOptionPane.showMessageDialog(this, "Unable to find an intact KeyPair, so we made you a new one :)", "Generated KeyPair!", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception ex1) {
+                Logger.getLogger(UI.class.getName()).log(Level.SEVERE, null, ex1);
+            }
         }
     }
 
@@ -37,46 +58,45 @@ public class UI extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
-        jTextField1 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
-        jLabel2 = new javax.swing.JLabel();
-        jButton3 = new javax.swing.JButton();
+        encryptOut = new javax.swing.JTextArea();
+        encryptSrc = new javax.swing.JTextField();
+        encryptBtn = new javax.swing.JButton();
+        srcLbl = new javax.swing.JLabel();
+        decryptBtn = new javax.swing.JButton();
+        encrypLbl = new javax.swing.JLabel();
+        fileEncrypterBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Encrypt Text");
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setLineWrap(true);
-        jTextArea1.setRows(5);
-        jTextArea1.setWrapStyleWord(true);
-        jScrollPane1.setViewportView(jTextArea1);
+        encryptOut.setColumns(20);
+        encryptOut.setLineWrap(true);
+        encryptOut.setRows(5);
+        encryptOut.setWrapStyleWord(true);
+        jScrollPane1.setViewportView(encryptOut);
 
-        jButton1.setText("Encrypt");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        encryptBtn.setText("Encrypt");
+        encryptBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                encryptBtnActionPerformed(evt);
             }
         });
 
-        jLabel1.setText("Text to Encrypt:");
+        srcLbl.setText("Text to Encrypt:");
 
-        jButton2.setText("Decrypt");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        decryptBtn.setText("Decrypt");
+        decryptBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                decryptBtnActionPerformed(evt);
             }
         });
 
-        jLabel2.setText("Encrypted Text:");
+        encrypLbl.setText("Encrypted Text:");
 
-        jButton3.setText("Switch to File");
-        jButton3.setEnabled(false);
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        fileEncrypterBtn.setText("Switch to File");
+        fileEncrypterBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                fileEncrypterBtnActionPerformed(evt);
             }
         });
 
@@ -87,19 +107,19 @@ public class UI extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextField1)
+                    .addComponent(encryptSrc)
                     .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(encryptBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 172, Short.MAX_VALUE))
+                        .addComponent(decryptBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 172, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2)
+                        .addComponent(encrypLbl)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
+                        .addComponent(srcLbl)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton3)))
+                        .addComponent(fileEncrypterBtn)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -107,16 +127,16 @@ public class UI extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jButton3))
+                    .addComponent(srcLbl)
+                    .addComponent(fileEncrypterBtn))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(encryptSrc, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(encryptBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(decryptBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel2)
+                .addComponent(encrypLbl)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -125,51 +145,41 @@ public class UI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+    private void encryptBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_encryptBtnActionPerformed
         //Encryption  code
-        if (!jTextField1.getText().isEmpty()) {
-            String text = jTextField1.getText();
+        if (!encryptSrc.getText().isEmpty()) {
+            String text = encryptSrc.getText();
             try {
                 PublicKey publicKey = RSAFileIO.load(rsaDir);
                 byte[] bytes = RSA.encrypt(text.getBytes(), publicKey);
-                jTextArea1.setText(DatatypeConverter.printBase64Binary(bytes));
+                encryptOut.setText(DatatypeConverter.printBase64Binary(bytes));
             } catch (Exception ex) {
-                try {
-                    KeyPair keys = RSAKeygen.generate(2048);
-                    RSAFileIO.save(rsaDir, keys);
-                    jTextArea1.setText("Generated new keypair. Please retry.");
-                } catch (Exception ex1) {
-                    Logger.getLogger(UI.class.getName()).log(Level.SEVERE, null, ex1);
-                }
+                initKeyPair();
             }
         }
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_encryptBtnActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-        // Decryption code.
-        if (!jTextArea1.getText().isEmpty()) {
+    private void decryptBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_decryptBtnActionPerformed
+        // Decryption code
+        if (!encryptOut.getText().isEmpty()) {
             try {
-                String data = jTextArea1.getText();
-                byte[] bytes = new byte[256];
-                bytes = DatatypeConverter.parseBase64Binary(data);
+                String data = encryptOut.getText();
+                byte[] bytes = DatatypeConverter.parseBase64Binary(data);
                 PrivateKey privateKey = RSAFileIO.loadPrivateKey(rsaDir);
                 byte[] decrypted = RSA.decrypt(bytes, privateKey);
-                jTextArea1.setText(readString(decrypted, 0));
+                encryptOut.setText(readString(decrypted, 0));
             } catch (Exception ex) {
-                Logger.getLogger(UI.class.getName()).log(Level.SEVERE, null, ex);
+                initKeyPair();
             }
         }
 
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_decryptBtnActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        /* TODO add your handling code here:
+    private void fileEncrypterBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileEncrypterBtnActionPerformed
         FileUI fUI = new FileUI(this);
         fUI.setVisible(true);
-        this.setVisible(false);*/
-    }//GEN-LAST:event_jButton3ActionPerformed
+        this.setVisible(false);
+    }//GEN-LAST:event_fileEncrypterBtnActionPerformed
 
     private String readString(byte[] data, int offset) {
         StringBuilder builder = new StringBuilder();
@@ -214,13 +224,13 @@ public class UI extends javax.swing.JFrame {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
+    private javax.swing.JButton decryptBtn;
+    private javax.swing.JLabel encrypLbl;
+    private javax.swing.JButton encryptBtn;
+    private javax.swing.JTextArea encryptOut;
+    private javax.swing.JTextField encryptSrc;
+    private javax.swing.JButton fileEncrypterBtn;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JLabel srcLbl;
     // End of variables declaration//GEN-END:variables
 }
