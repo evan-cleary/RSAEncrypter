@@ -19,7 +19,7 @@ public class FileUI extends javax.swing.JFrame {
 
     private File sourceFile;
     private File destinationFile;
-    private UI parent;
+    private TextUI parent;
 
     /**
      * Creates new form FileUI
@@ -28,7 +28,7 @@ public class FileUI extends javax.swing.JFrame {
         initComponents();
     }
 
-    public FileUI(UI parent) {
+    public FileUI(TextUI parent) {
         initComponents();
         this.parent = parent;
     }
